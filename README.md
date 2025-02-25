@@ -16,8 +16,10 @@ This repository contains a pipeline that converts responses from a Language Mode
 
 ### Prerequisites
 
-- Shell
-- [Add any other prerequisites here]
+- Bash
+- Festival TTS
+- Ollama
+- Phi4:14b
 
 ### Installation
 
