@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Steampunk Phi4 TTS</title>
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <!-- Font Awesome for icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  />
+  <style>
+    /* Base transitions and positioning */
+    body {
+      font-family: 'Courier New', Courier, monospace;
+      transition: background-color 0.3s, color 0.3s;
+      position: relative;
+      min-height: 100vh;
+    }
+    /* Light mode: parchment background */
+    body.light-mode {
+      background-color: #f3e5ab;
+      color: #3e2723;
+    }
+    /* Dark mode: Discord-like dark background */
+    body.dark-mode {
+      background-color: #36393f;
+      color: #ffffff;
+    }
+    /* Steampunk header with glowing animation */
+    .steampunk-header {
+      font-size: 3rem;
+      font-weight: bold;
+      text-align: center;
+      position: relative;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+    @keyframes glow {
+      from { text-shadow: 0 0 10px rgba(141, 110, 99, 0.7); }
+      to   { text-shadow: 0 0 20px rgba(93, 64, 55, 0.9); }
+    }
+    /* Spinning gear icon */
+    .gear {
+      font-size: 2rem;
+      animation: spin 4s linear infinite;
+      color: #8d6e63;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    /* Animated form container; positioned above background emojis */
+    .tts-form {
+      background: rgba(255, 255, 255, 0.85);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      animation: fadeInUp 1s ease-out;
+      position: relative;
+      z-index: 1;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* Dark mode adjustments for form */
+    body.dark-mode .tts-form {
+      background: rgba(54, 57, 63, 0.9);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+    /* Footer with fade-in */
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.9rem;
+      animation: fadeIn 2s ease-in;
+      position: relative;
+      z-index: 1;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    /* Dark mode/light mode toggle switch */
+    .toggle-switch {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+      position: relative;
+      z-index: 1;
+    }
+    .toggle-switch input[type="checkbox"] {
+      width: 50px;
+      height: 25px;
+      appearance: none;
+      background: #ccc;
+      outline: none;
+      border-radius: 25px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .toggle-switch input[type="checkbox"]::before {
+      content: "";
+      position: absolute;
+      width: 21px;
+      height: 21px;
+      border-radius: 50%;
+      background: #fff;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s;
+    }
+    .toggle-switch input[type="checkbox"]:checked {
+      background: #4a90e2;
+    }
+    .toggle-switch input[type="checkbox"]:checked::before {
+      transform: translateX(25px);
+    }
+    .toggle-switch label {
+      margin-left: 10px;
+      font-weight: bold;
+    }
+    /* Loading animation */
+    #loading {
+      display: none;
+      text-align: center;
+      animation: fadeIn 0.5s ease-in;
+      position: relative;
+      z-index: 1;
+    }
+    /* Emoji stream container (background) */
+    #emoji-stream {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+    /* Each emoji floats upward continuously */
+    .emoji {
+      position: absolute;
+      bottom: -50px;
+      font-size: 2rem;
+      animation: floatUp linear infinite;
+    }
+    @keyframes floatUp {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body class="light-mode">
+  <!-- Emoji Stream Container: Continuous upward movement -->
+  <div id="emoji-stream">
+    <span class="emoji" style="left: 10%; animation-delay: 0s; animation-duration: 10s;">🤖</span>
+    <span class="emoji" style="left: 30%; animation-delay: 2s; animation-duration: 12s;">🎙️</span>
+    <span class="emoji" style="left: 50%; animation-delay: 4s; animation-duration: 11s;">🗣️</span>
+    <span class="emoji" style="left: 70%; animation-delay: 1s; animation-duration: 13s;">🔊</span>
+    <span class="emoji" style="left: 90%; animation-delay: 3s; animation-duration: 9s;">💬</span>
+    <span class="emoji" style="left: 20%; animation-delay: 5s; animation-duration: 14s;">🧠</span>
+    <span class="emoji" style="left: 40%; animation-delay: 0.5s; animation-duration: 10s;">🤖</span>
+    <span class="emoji" style="left: 60%; animation-delay: 2.5s; animation-duration: 12s;">🎙️</span>
+    <span class="emoji" style="left: 80%; animation-delay: 4.5s; animation-duration: 11s;">💡</span>
+    <span class="emoji" style="left: 15%; animation-delay: 3.5s; animation-duration: 13s;">📢</span>
+    <!-- You can add more emojis similarly for a richer stream -->
+  </div>
+
+  <div class="container py-4">
+    <!-- Dark/Light Mode Toggle -->
+    <div class="toggle-switch">
+      <input type="checkbox" id="modeToggle" />
+      <label for="modeToggle">Dark Mode</label>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8 col-lg-6">
+        <div class="text-center mb-4">
+          <div class="steampunk-header">
+            Phi4 TTS <i class="fas fa-cog gear"></i>
+          </div>
+        </div>
+        <!-- Form container -->
+        <div id="formContainer" class="tts-form">
+          <form id="ttsForm">
+            <div class="mb-3">
+              <label for="prompt" class="form-label">Enter your prompt:</label>
+              <textarea class="form-control" name="prompt" id="prompt" rows="4" placeholder="Enter your prompt here..."></textarea>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary">Send</button>
+            </div>
+          </form>
+        </div>
+        <!-- Loading animation -->
+        <div id="loading">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p>Processing TTS...</p>
+        </div>
+        <!-- Audio Player -->
+        <div id="audioContainer" class="mt-4" style="display: none;">
+          <audio id="audioPlayer" controls class="w-100"></audio>
+        </div>
+        <div class="footer">
+          <p>Steampunk TTS powered by Phi4</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Dark mode toggle handler
+    const modeToggle = document.getElementById('modeToggle');
+    const body = document.body;
+
+    // Load saved mode preference from localStorage
+    if (localStorage.getItem('mode') === 'dark') {
+      body.classList.remove('light-mode');
+      body.classList.add('dark-mode');
+      modeToggle.checked = true;
+    }
+
+    modeToggle.addEventListener('change', function() {
+      if (this.checked) {
+        body.classList.remove('light-mode');
+        body.classList.add('dark-mode');
+        localStorage.setItem('mode', 'dark');
+      } else {
+        body.classList.remove('dark-mode');
+        body.classList.add('light-mode');
+        localStorage.setItem('mode', 'light');
+      }
+    });
+
+    // TTS form submission handler with loading animation
+    document.getElementById("ttsForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      // Hide the form container and show the loading animation
+      document.getElementById("formContainer").style.display = "none";
+      document.getElementById("loading").style.display = "block";
+
+      const prompt = document.getElementById("prompt").value;
+      const formData = new FormData();
+      formData.append("prompt", prompt);
+
+      try {
+        const response = await fetch("/tts", {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) {
+          alert("Error from server");
+          // In case of error, bring back the form
+          document.getElementById("formContainer").style.display = "block";
+          document.getElementById("loading").style.display = "none";
+          return;
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        document.getElementById("audioPlayer").src = url;
+        document.getElementById("audioPlayer").play();
+
+        // Hide loading and show audio player
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("audioContainer").style.display = "block";
+      } catch (error) {
+        alert("Error processing request.");
+        document.getElementById("formContainer").style.display = "block";
+        document.getElementById("loading").style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>
